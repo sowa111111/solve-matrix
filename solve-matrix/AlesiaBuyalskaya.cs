@@ -6,11 +6,11 @@ namespace solve_matrix
 {
     public class AlesiaBuyalskaya
     {
-        private static readonly char[] vowels = new char[] { 'a', 'e', 'i', 'o', 'u', 'y' };
+        private static readonly char[] Vowels = { 'a', 'e', 'i', 'o', 'u', 'y' };
 
         public static int SolveMatrix()
         {
-            char?[,] input = new char?[5, 5]
+            var input = new char?[,]
             {
                 {'a', 'b', 'c', null, 'e' },
                 { null, 'g', 'h', 'i', 'j' },
@@ -21,24 +21,17 @@ namespace solve_matrix
 
             var possibleMoves = GetPossibleMoves(input);
 
-            var allCombination = 0;
-
-            foreach (var cell in possibleMoves.Keys)
-            {
-                allCombination += GetCombinationsCount(possibleMoves, cell, 0, 1);
-            }
-
-            return allCombination;
+            return possibleMoves.Keys.Sum(cell => GetCombinationsCount(possibleMoves, cell, 0, 1));
         }
 
         private static Dictionary<Cell, List<Cell>> GetPossibleMoves(char?[,] input)
         {
-            Dictionary<Cell, List<Cell>> possibleMoves = new Dictionary<Cell, List<Cell>>(new CellComparer());
+            var possibleMoves = new Dictionary<Cell, List<Cell>>(new CellComparer());
             var matrixSize = input.GetLength(0);
 
-            for (int i = 0; i < matrixSize; i++)
+            for (var i = 0; i < matrixSize; i++)
             {
-                for (int j = 0; j < matrixSize; j++)
+                for (var j = 0; j < matrixSize; j++)
                 {
                     if (input[i, j] != null)
                     {
@@ -61,7 +54,7 @@ namespace solve_matrix
             var stepsX = new[] { -1, -2, -1, -2, 1, 2, 1, 2 };
             var stepsY = new[] { -2, -1, 2, 1, -2, -1, 2, 1 };
 
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
                 if (TryGetValidMove(cell.X + stepsX[i], cell.Y + stepsY[i], matrixSize, out var validMove))
                 {
@@ -86,7 +79,7 @@ namespace solve_matrix
 
         private static int GetCombinationsCount(Dictionary<Cell, List<Cell>> possibleMoves, Cell cell, int vowelCount, int step)
         {
-            if (vowels.Contains(cell.Value))
+            if (Vowels.Contains(cell.Value))
             {
                 vowelCount++;
             }
@@ -98,15 +91,9 @@ namespace solve_matrix
                 return 1;
 
             var nextCells = possibleMoves[cell];
-            var count = 0;
             step++;
 
-            foreach (var nextCell in nextCells)
-            {
-                count += GetCombinationsCount(possibleMoves, nextCell, vowelCount, step);
-            }
-
-            return count;
+            return nextCells.Sum(nextCell => GetCombinationsCount(possibleMoves, nextCell, vowelCount, step));
         }
     }
 
